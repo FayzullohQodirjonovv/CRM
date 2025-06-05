@@ -83,7 +83,6 @@ const KurslarPage = () => {
         ))}
       </div>
 
-      {/* MODAL */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
           <div className="bg-zinc-800 p-6 rounded-lg w-full max-w-md">

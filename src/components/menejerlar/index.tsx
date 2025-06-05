@@ -5,7 +5,7 @@ interface Admin {
   ism: string;
   familiya: string;
   email: string;
-  rol: string; // Admin uchun ham rol bo'lishi mumkin
+  rol: string; 
   holat: string;
 }
 

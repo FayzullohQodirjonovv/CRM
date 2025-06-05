@@ -7,12 +7,11 @@ import Dashboard from './components/dashbord/index';
 const App: React.FC = () => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
 
-  // localStorage tokeni o‘zgarsa, tokenni yangilaymiz
   useEffect(() => {
     const interval = setInterval(() => {
       const storedToken = localStorage.getItem('token');
       setToken(storedToken);
-    }, 500); // har 0.5 sekundda tekshirib turadi
+    }, 500); 
 
     return () => clearInterval(interval);
   }, []);
