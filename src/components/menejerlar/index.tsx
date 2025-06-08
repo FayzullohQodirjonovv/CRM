@@ -5,7 +5,7 @@ interface Admin {
   ism: string;
   familiya: string;
   email: string;
-  rol: string; 
+  rol: string;
   holat: string;
 }
 
@@ -13,26 +13,16 @@ const AdminlarPage: React.FC = () => {
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editData, setEditData] = useState<Admin | null>(null);
-
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
-
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
-        const response = await fetch('http://localhost:7070/api/staff/edited-admin', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP xatosi! Status: ${response.status}`);
-        }
-
+        const response = await fetch('http://localhost:7070/api/staff/edited-admin');
+        if (!response.ok) throw new Error(`HTTP xatosi! Status: ${response.status}`);
         const data: Admin[] = await response.json();
         setAdmins(data);
       } catch (err: any) {
@@ -41,8 +31,17 @@ const AdminlarPage: React.FC = () => {
         setLoading(false);
       }
     };
-
     fetchAdmins();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const openEditModal = (admin: Admin) => {
@@ -58,11 +57,7 @@ const AdminlarPage: React.FC = () => {
 
   const saveEdit = () => {
     if (!editData) return;
-
-    setAdmins((prev) =>
-      prev.map((a) => (a.id === editData.id ? editData : a))
-    );
-
+    setAdmins((prev) => prev.map((a) => (a.id === editData.id ? editData : a)));
     setIsEditModalOpen(false);
     setEditData(null);
   };
@@ -72,75 +67,56 @@ const AdminlarPage: React.FC = () => {
     setOpenMenuId(null);
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node)
-      ) {
-        setOpenMenuId(null);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  if (loading) {
-    return <div className="p-6 text-white bg-gray-900">Adminlar ro'yxati yuklanmoqda...</div>;
-  }
-
-  if (error) {
-    return <div className="p-6 text-red-500 bg-gray-900">Ma'lumotlarni yuklashda xato yuz berdi: {error}</div>;
-  }
+  if (loading) return <div className="p-6 text-white bg-gray-900">Yuklanmoqda...</div>;
+  if (error) return <div className="p-6 text-red-500 bg-gray-900">Xato: {error}</div>;
 
   return (
-    <div className="p-6 bg-black min-h-screen text-white">
-      <h2 className="text-2xl font-semibold mb-6">Foydalanuvchilar ro'yxati (Adminlar)</h2>
+    <div className="p-4 bg-black min-h-screen text-white">
+      <h2 className="text-2xl font-semibold mb-6">Adminlar ro'yxati</h2>
+
       <div className="overflow-x-auto rounded-lg shadow-md">
-        <table className="w-full border-collapse">
+        <table className="min-w-[800px] w-full border-collapse">
           <thead>
             <tr className="bg-gray-800 text-gray-300 uppercase text-sm">
-              <th className="py-3 px-6 text-left">Ism</th>
-              <th className="py-3 px-6 text-left">Familiya</th>
-              <th className="py-3 px-6 text-left">Email</th>
-              <th className="py-3 px-6 text-left">Rol</th>
-              <th className="py-3 px-6 text-left">Holat</th>
-              <th className="py-3 px-6 text-center">Amallar</th>
+              <th className="py-3 px-4 text-left">Ism</th>
+              <th className="py-3 px-4 text-left">Familiya</th>
+              <th className="py-3 px-4 text-left">Email</th>
+              <th className="py-3 px-4 text-left">Rol</th>
+              <th className="py-3 px-4 text-left">Holat</th>
+              <th className="py-3 px-4 text-center">Amallar</th>
             </tr>
           </thead>
           <tbody className="text-gray-200 text-sm">
             {admins.map((admin) => (
               <tr key={admin.id} className="border-b border-gray-700 hover:bg-gray-800">
-                <td className="py-3 px-6 text-left">{admin.ism}</td>
-                <td className="py-3 px-6 text-left">{admin.familiya}</td>
-                <td className="py-3 px-6 text-left">{admin.email}</td>
-                <td className="py-3 px-6 text-left">{admin.rol}</td>
-                <td className="py-3 px-6 text-left">
+                <td className="py-3 px-4">{admin.ism}</td>
+                <td className="py-3 px-4">{admin.familiya}</td>
+                <td className="py-3 px-4">{admin.email}</td>
+                <td className="py-3 px-4">{admin.rol}</td>
+                <td className="py-3 px-4">
                   <span
                     className={`py-1 px-3 rounded-full text-xs font-semibold ${
-                      admin.holat === 'faol' ? 'text-green-100' : 'text-red-100'
+                      admin.holat === 'faol' ? 'text-green-400' : 'text-red-400'
                     }`}
                   >
                     {admin.holat}
                   </span>
                 </td>
-                <td className="py-3 px-6 text-center relative">
+                <td className="py-3 px-4 text-center relative">
                   <button
-                    onClick={() =>
-                      setOpenMenuId(openMenuId === admin.id ? null : admin.id)
-                    }
-                    className="hover:underline"
+                    onClick={() => setOpenMenuId(openMenuId === admin.id ? null : admin.id)}
+                    className="text-white hover:text-gray-400"
                   >
                     ...
                   </button>
                   {openMenuId === admin.id && (
                     <div
                       ref={menuRef}
-                      className="absolute right-0 mt-2 w-32 bg-gray-800 rounded shadow-lg z-30"
+                      className="absolute right-0 mt-2 w-32 bg-gray-900 rounded shadow-lg z-50"
                     >
                       <button
                         onClick={() => openEditModal(admin)}
-                        className="block w-full text-left px-4 py-2 text-white hover:bg-gray-700"
+                        className="block w-full text-left px-4 py-2 hover:bg-gray-700"
                       >
                         Tahrirlash
                       </button>
@@ -160,55 +136,30 @@ const AdminlarPage: React.FC = () => {
       </div>
 
       {isEditModalOpen && editData && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 w-96">
-            <h3 className="text-xl font-semibold mb-4 text-white">Tahrirlash</h3>
-            <label className="block text-gray-300 mb-1">Ism</label>
-            <input
-              type="text"
-              value={editData.ism}
-              onChange={(e) => setEditData({ ...editData, ism: e.target.value })}
-              className="w-full mb-3 p-2 rounded bg-gray-700 text-white focus:outline-none"
-            />
-            <label className="block text-gray-300 mb-1">Familiya</label>
-            <input
-              type="text"
-              value={editData.familiya}
-              onChange={(e) => setEditData({ ...editData, familiya: e.target.value })}
-              className="w-full mb-3 p-2 rounded bg-gray-700 text-white focus:outline-none"
-            />
-            <label className="block text-gray-300 mb-1">Email</label>
-            <input
-              type="email"
-              value={editData.email}
-              onChange={(e) => setEditData({ ...editData, email: e.target.value })}
-              className="w-full mb-3 p-2 rounded bg-gray-700 text-white focus:outline-none"
-            />
-            <label className="block text-gray-300 mb-1">Rol</label>
-            <input
-              type="text"
-              value={editData.rol}
-              onChange={(e) => setEditData({ ...editData, rol: e.target.value })}
-              className="w-full mb-3 p-2 rounded bg-gray-700 text-white focus:outline-none"
-            />
-            <label className="block text-gray-300 mb-1">Holat</label>
-            <input
-              type="text"
-              value={editData.holat}
-              onChange={(e) => setEditData({ ...editData, holat: e.target.value })}
-              className="w-full mb-4 p-2 rounded bg-gray-700 text-white focus:outline-none"
-            />
-
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 w-[90%] max-w-md">
+            <h3 className="text-xl font-semibold mb-4">Tahrirlash</h3>
+            {['ism', 'familiya', 'email', 'rol', 'holat'].map((field) => (
+              <div key={field}>
+                <label className="block text-gray-300 capitalize mb-1">{field}</label>
+                <input
+                  type={field === 'email' ? 'email' : 'text'}
+                  value={(editData as any)[field]}
+                  onChange={(e) => setEditData({ ...editData, [field]: e.target.value })}
+                  className="w-full mb-3 p-2 rounded bg-gray-700 text-white focus:outline-none"
+                />
+              </div>
+            ))}
             <div className="flex justify-end space-x-3">
               <button
                 onClick={cancelEdit}
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded text-white"
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded"
               >
                 Bekor qilish
               </button>
               <button
                 onClick={saveEdit}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded text-white"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded"
               >
                 Saqlash
               </button>

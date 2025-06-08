@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import {
   FaHome, FaUserTie, FaUserCog, FaChalkboardTeacher, FaUserGraduate,
@@ -18,6 +18,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ loggedInEmail }) => {
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -51,9 +52,22 @@ const Dashboard: React.FC<DashboardProps> = ({ loggedInEmail }) => {
 
   return (
     <div className="flex min-h-screen bg-neutral-950 text-white">
-      <aside className="w-64 bg-neutral-900 p-6 flex flex-col justify-between border-r border-neutral-800 shadow-lg">
+      {/* Sidebar */}
+      <aside
+        className={`
+          bg-neutral-900 p-6 flex flex-col justify-between border-r border-neutral-800 shadow-lg 
+          fixed md:static top-0 left-0 h-full md:h-auto z-50 transition-transform transform 
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+          md:translate-x-0 md:flex md:w-64 w-64
+        `}
+      >
         <div>
-          <div className="text-2xl font-bold mb-8 text-white">Admin CRM</div>
+          <div className="text-2xl font-bold mb-8 text-white flex justify-between items-center">
+            Admin CRM
+            <button onClick={() => setSidebarOpen(false)} className="text-white text-2xl md:hidden">
+              ×
+            </button>
+          </div>
           <nav>
             <ul className="space-y-2">
               <li className="text-gray-400 text-sm mb-2 uppercase tracking-wide">Menu</li>
@@ -66,6 +80,7 @@ const Dashboard: React.FC<DashboardProps> = ({ loggedInEmail }) => {
                         ? 'bg-neutral-800 text-white'
                         : 'text-gray-300 hover:bg-neutral-800 hover:text-white'
                     }`}
+                    onClick={() => setSidebarOpen(false)} // close on mobile
                   >
                     <item.icon className="mr-3 text-lg" />
                     <span>{item.label}</span>
@@ -82,6 +97,7 @@ const Dashboard: React.FC<DashboardProps> = ({ loggedInEmail }) => {
                         ? 'bg-neutral-800 text-white'
                         : 'text-gray-300 hover:bg-neutral-800 hover:text-white'
                     }`}
+                    onClick={() => setSidebarOpen(false)} // close on mobile
                   >
                     <item.icon className="mr-3 text-lg" />
                     <span>{item.label}</span>
@@ -103,9 +119,18 @@ const Dashboard: React.FC<DashboardProps> = ({ loggedInEmail }) => {
         </div>
       </aside>
 
+      {/* Right content */}
       <div className="flex-1 flex flex-col">
+        {/* Header */}
         <header className="bg-neutral-900 p-4 flex items-center justify-between border-b border-neutral-800 shadow-md">
           <div className="flex items-center">
+            {/* Burger icon */}
+            <button
+              className="text-white text-2xl mr-4 md:hidden"
+              onClick={() => setSidebarOpen(true)}
+            >
+              ☰
+            </button>
             <span className="text-gray-400 mr-2">
               <FaHome className="inline-block mr-1" /> Asosiy
             </span>
@@ -124,6 +149,7 @@ const Dashboard: React.FC<DashboardProps> = ({ loggedInEmail }) => {
           </div>
         </header>
 
+        {/* Main content */}
         <main className="flex-1 p-8 overflow-auto bg-neutral-950">
           <Routes>
             <Route index element={<DashboardHome loggedInEmail={loggedInEmail} />} />
